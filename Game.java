@@ -57,29 +57,49 @@ public class Game {
         /*
          * Moving the player and trying to move the player out of the grid.
          */
-        player1.moveUp();
-        player1.moveRight();
-        player1.moveRight();
-        player1.moveDown();
-        player1.moveDown();
-        player1.moveLeft();
-        player1.moveDown();
 
-        /*
-         * Looping and creating the grid and getting our player displayed on to it as P.
-         */
-        for( int y = 0; y < player1.getHeight(); y++ ) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+
+            /*
+            * Looping and creating the grid and getting our player displayed on to it as P.
+            */
+            for( int y = 0; y < player1.getHeight(); y++ ) {
+                System.out.println("");
+                for( int x = 0; x < player1.getWidth(); x++ ){
+
+                    GameObject foundObject = findGameObject(x, y, objects);
+
+                    if (foundObject != null) {
+                        System.out.print(foundObject.getSymbol());
+                    }
+                    else {
+                        System.out.print("  .  ");
+                    }
+                }
+            }
+
+            String input = scanner.nextLine();
             System.out.println("");
-            for( int x = 0; x < player1.getWidth(); x++ ){
 
-                GameObject foundObject = findGameObject(x, y, objects);
-
-                if (foundObject != null) {
-                    System.out.print(foundObject.getSymbol());
-                }
-                else {
-                    System.out.print("  .  ");
-                }
+            if (input.equals("w")) {
+                tryMovePlayer(0, -1, player1, objects);
+            }
+            else if (input.equals("s")) {
+                tryMovePlayer(0, 1, player1, objects);
+            }
+            else if (input.equals("a")) {
+                tryMovePlayer(-1, 0, player1, objects);
+            }
+            else if (input.equals("d")) {
+                tryMovePlayer(1, 0, player1, objects);
+            }
+            else if (input.equals("q")) {
+                break ;                
+            }
+            else {
+                System.out.println("Please type a correct movement button");
             }
         }
     }
@@ -93,5 +113,25 @@ public class Game {
                     return obj;
                 }
         return null;
+    }
+
+    public static void tryMovePlayer(int dx, int dy, Player player, List<GameObject> objects){
+        int new_x = player.getPosition().getX() + dx ;
+        int new_y = player.getPosition().getY() + dy ; 
+        GameObject foundObject = findGameObject(new_x, new_y, objects) ;
+
+        if (foundObject == null) {
+           player.move(dx, dy);
+        }
+        else if (foundObject instanceof Wall) {
+            return ;
+        }
+        else if (foundObject instanceof Box) {
+            if (findGameObject( new_x + dx, new_y + dy, objects) != null) {
+                return ;
+            }
+            ((Box) foundObject).move(dx, dy);
+            player.move(dx, dy);
+        }      
     }
 }

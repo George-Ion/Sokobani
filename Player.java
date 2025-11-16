@@ -1,4 +1,4 @@
-public class Player extends GameObject{
+public class Player extends GameObject implements Movable{
 
     private int gridWidth;
     private int gridHeight;
@@ -12,59 +12,36 @@ public class Player extends GameObject{
         this.gridHeight = gridHeight;
     }
     /*
-     * Following is the moves that a player can do with constrains in them regarding the grid.
-     * Change the currPosition with 
-     */
-    public void moveUp() {
-        if (getPosition().getY() - 1 >= 0) {
-            getPosition().setY(getPosition().getY() - 1);
-        }
-        else {
-            System.out.println("Cant move, out of grid!");
-        }
-    }
-
-    public void moveDown() {
-        if (getPosition().getY() + 1 < gridHeight) {
-            getPosition().setY(getPosition().getY() + 1);
-        } 
-        else {
-            System.out.println("Cant move, out of grid!");
-        }
-    }
-    
-    public void moveLeft() { 
-        if (getPosition().getX() - 1 >= 0) {
-            getPosition().setX(getPosition().getX() - 1);
-        }
-        else {
-            System.out.println("Cant move, out of grid!");
-        }
-    }
-    
-    public void moveRight() {
-        if (getPosition().getX() + 1 < gridWidth) {
-            getPosition().setX(getPosition().getX() + 1);
-        }
-        else {
-            System.out.println("Cant move, out of grid!");
-        }
-    }
-
-    /*
      * Creating getWidth and getHeight to be able t pass it to our loop in main.
      */
     public int getWidth() {
-        return gridWidth;
+        return this.gridWidth;
     }
 
     public int getHeight() {
-        return gridHeight;
+        return this.gridHeight;
     }
 
     @Override
     public String getSymbol() {
         return "  P  " ;
+    }
+
+    @Override
+    public void move(int dx, int dy) {
+        
+        Position position = getPosition();
+
+        int new_x = position.getX() + dx;
+        int new_y = position.getY() + dy;
+
+        if (new_x < 0 || new_x >= gridWidth || new_y < 0 || new_y >= gridHeight)  {
+            System.out.println("Cant move, out of grid!");
+            return ;
+        }
+
+        position.setX(new_x);
+        position.setY(new_y);
     }
 }
 
