@@ -22,11 +22,19 @@ public class Player extends GameObject implements Movable{
         return this.gridHeight;
     }
 
-    @Override
-    public String getSymbol() {
-        return "  P  " ;
+    public void setDimensions(int newHeight, int newWidth) {
+        this.gridHeight = newHeight;
+        this.gridWidth = newWidth;
     }
 
+    @Override
+    public String getSymbol() {
+        return "P" ;
+    }
+
+    /*
+    Removed all move methods to pass it through the implemented move method.
+    */
     @Override
     public void move(int dx, int dy) {
         

@@ -6,7 +6,7 @@ public class Target extends GameObject{
 
     @Override
     public String getSymbol() {
-        return "  T  ";
+        return "T";
     }
     
 }

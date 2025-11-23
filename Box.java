@@ -6,9 +6,12 @@ public class Box extends GameObject implements Movable {
 
     @Override
     public String getSymbol() {
-        return "  B  ";
+        return "B";
     }
 
+    /*
+    Box will move only by dx and dy . The check for box colission will be in the Game class
+     */
     @Override
     public void move(int dx, int dy) {
         Position position = getPosition();

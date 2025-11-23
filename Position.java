@@ -37,4 +37,13 @@ public class Position {
         return "("+ x_coordinate + "," + y_coordinate + ")";
     }
 
+    //Overriding equals to be able to compare two GameObject positions , to see if target and box are in the same coordinates
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Position other = (Position) obj;
+        return this.getX() == other.getX() && this.getY() == other.getY();
+    }
+
 }
