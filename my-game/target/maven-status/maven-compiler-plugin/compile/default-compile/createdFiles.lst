@@ -1,0 +1,11 @@
+com\george\Game.class
+com\george\InvalidLevelFormatException.class
+com\george\Box.class
+com\george\GameMap.class
+com\george\Movable.class
+com\george\Player.class
+com\george\Target.class
+com\george\Wall.class
+com\george\Position.class
+com\george\Main.class
+com\george\GameObject.class
