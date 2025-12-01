@@ -23,7 +23,7 @@ public abstract class GameObject {
     public abstract String getSymbol();
 
     /*
-    * Creating isAt method to check the position of the GameObjects Microsoft.QuickAction.WiFi
+    * Creating isAt method to check the position of the GameObjects 
     */
     public boolean isAt(int x , int y) {
         return location.getX() == x && location.getY() == y ;

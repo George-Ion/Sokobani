@@ -2,7 +2,6 @@ package com.george;
 
 public class InputHandler {
 
-
     public static void fireMoveUp(GameMap map) {
         int dy = -1 ;
         map.movePlayer(0, dy);

@@ -21,14 +21,39 @@ public class GameMap {
 
     }
     /**
-     * Draws the current state of the map to the console.
+     * Draws the map, but checks for overlaps (Box on Target) to print special symbols.
      */ 
     private void draw() {
         for (int y = 0; y < height; y++) {
             StringBuilder row = new StringBuilder();
             for (int x = 0; x < width; x++) {
-                GameObject obj = findGameObject(x, y);
-                row.append((obj != null ? obj.getSymbol() : '.') + " ");
+                
+                // Find the top object 
+                GameObject topObj = findGameObject(x, y);
+                
+                // Check if there is also a target in the position
+                boolean hasTarget = false;
+                for (GameObject staticObj : staticObj) {
+                    if (staticObj instanceof Target && staticObj.isAt(x, y)) {
+                        hasTarget = true;
+                        break;
+                    }
+                }
+
+                //  deciding on what to print 
+                char symbol;
+                if (topObj == null) {
+                    //we need to print the target if it is there
+                    symbol = hasTarget ? 'T' : ' '; 
+                } else if (hasTarget && topObj instanceof Box) {
+                    symbol = '*'; 
+                } else if (hasTarget && topObj instanceof Player) {
+                    symbol = '+'; 
+                } else {
+                    symbol = topObj.getSymbol().charAt(0); 
+                }
+
+                row.append(symbol + " ");
             }
             System.out.println(row);
         }
@@ -115,20 +140,38 @@ public class GameMap {
     /**
      * Read the level line by line and and create the coordinates of all the objects
      * Switching to streams so i can work with the levels from resources
+     * This method prioritizes local files for saved games 
+     * If a local file is not found, it attempts to load from the classpath resources 
+     * @throws Exception If the file cannot be found or the format is invalid.
     */ 
-    public void loadFromFile(String filename) {
+    public void loadFromFile(String filename) throws Exception {
+        //clean objects so we if we load new map we dont have duplicated values
+        staticObj.clear();
+        dynamicObj.clear();
 
         int playercount = 0;
 
-        InputStream stream = getClass().getResourceAsStream("/" + filename);
-
-        if (stream == null) {
-            System.out.println("Error: Could not find file " + filename);
-            return; 
+        Scanner scanner = null;
+        File file = new File(filename);
+        
+        // Determining the source of the file 
+        if (file.exists()) {
+            // Found it on disk this works for saved games
+            scanner = new Scanner(file);
+        } else {
+            // Didn't find on disk, check resources 
+            InputStream stream = getClass().getResourceAsStream("/" + filename);
+            if (stream == null) {
+                throw new IOException("Could not find file: " + filename);
+            }
+            scanner = new Scanner(stream);
         }
 
-        try (Scanner scanner = new Scanner(stream)) {
-            int y = 0;
+        int y = 0;
+
+        // we use try to ensure try closes automatically 
+        try (Scanner s = scanner) {
+            
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 // Created the if so the grid width will not need to update through each loop
@@ -165,6 +208,18 @@ public class GameMap {
                             Box box = new Box(boxPosition);
                             dynamicObj.add(box);
                             break;
+                            // message for saved games
+                        case "*": 
+                            Position posStar = new Position(x, y);
+                            staticObj.add(new Target(posStar));
+                            dynamicObj.add(new Box(posStar));
+                            break;
+                        case "+": 
+                            Position posPlus = new Position(x, y);
+                            staticObj.add(new Target(posPlus));
+                            playercount++;
+                            dynamicObj.add(new Player(posPlus, this.height, this.width));
+                            break;
                         case " ":
                             break;
                         default:
@@ -184,23 +239,72 @@ public class GameMap {
                     break;
                 }
             }
-
+            //validating we only have one player
             if (playercount != 1) {
                 throw new InvalidLevelFormatException("Game should exactly have one player");
             }
-
-        }catch (Exception ex) {
-            System.out.println("Something went wrong" + ex.getMessage());
         }
     }
 
+    /**
+     * Saving the current map state to be able to do autosave 
+     * @param filename
+     */
     public void writeToFile(String filename) {
-        char[][] grid = new char[this.height][this.width];
+        // need a 2D string because the map is 2D
+        String[][] grid = new String[this.height][this.width];
+        // itteration through the map just to fill the 2D array
         for (int y = 0 ; y < this.height ; y++) {
             for (int x = 0 ; x < this.width ; x++) {
-                grid[y][x] = ' ' ;
+                grid[y][x] = " " ;
             }
         }
-    }
+        // first we place the static objects 
+        for (GameObject statObject : staticObj) {
+            Position statPosition = statObject.getPosition();
+            int statX = statPosition.getX();
+            int statY = statPosition.getY();
+            String Symbol = statObject.getSymbol();
+            grid[statY][statX] = Symbol ;
+        }
 
+        // we then place in our array the dynamic objects with cheking if P , B are on the same 
+        // position as a Target 
+        for (GameObject dynObj : dynamicObj) {
+            int x = dynObj.getPosition().getX();
+            int y = dynObj.getPosition().getY();
+            
+            boolean onTarget = false;
+            for (GameObject staticObj : staticObj) {
+                if (staticObj instanceof Target && staticObj.isAt(x, y)) {
+                    onTarget = true;
+                    break;
+                }
+            }
+
+            if (onTarget) {
+                if (dynObj instanceof Box) {
+                    grid[y][x] = "*"; 
+                } else {
+                    grid[y][x] = "+"; 
+                }
+            } else {
+                grid[y][x] = dynObj.getSymbol(); 
+            }
+        }
+
+        // Saves it to the file
+        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(filename))) {
+            for (int y = 0; y < this.height; y++) {
+                for (int x = 0; x < this.width; x++) {
+                    writer.write(grid[y][x]);
+                }
+                writer.newLine(); 
+            }
+        } catch (java.io.IOException e) {
+            System.out.println("Autosave failed: " + e.getMessage());
+        }
+    }
 }
+
+
