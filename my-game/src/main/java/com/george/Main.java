@@ -24,27 +24,18 @@ public class Main {
             if (input.equals("q"))
                 break;
 
-            int dx = 0, dy = 0;
-            switch (input) {
-                case "w":
-                    dy = -1;
-                    break;
-                case "s":
-                    dy = 1;
-                    break;
-                case "a":
-                    dx = -1;
-                    break;
-                case "d":
-                    dx = 1;
-                    break;
-                default:
-                    System.out.println("Invalid input");
-                    break;
+            char c = Character.toLowerCase(input.charAt(0));
+
+            switch (c) {
+                case 'w' -> InputHandler.fireMoveUp(level);
+                case 'a' -> InputHandler.fireMoveLeft(level);
+                case 's' -> InputHandler.fireMoveDown(level);
+                case 'd' -> InputHandler.fireMoveRight(level);
+                case 'r' -> <call restart logic>;
+                default   -> 
+                    System.out.println("Invalid input. Use w/a/s/d to move.");
             }
-            if (dx != 0 || dy != 0) {
-                level.movePlayer(dx, dy);
-            }
+
         }
         scanner.close();
     }

@@ -193,4 +193,14 @@ public class GameMap {
             System.out.println("Something went wrong" + ex.getMessage());
         }
     }
+
+    public void writeToFile(String filename) {
+        char[][] grid = new char[this.height][this.width];
+        for (int y = 0 ; y < this.height ; y++) {
+            for (int x = 0 ; x < this.width ; x++) {
+                grid[y][x] = ' ' ;
+            }
+        }
+    }
+
 }
