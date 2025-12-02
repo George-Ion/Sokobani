@@ -210,15 +210,19 @@ public class GameMap {
                             break;
                             // message for saved games
                         case "*": 
-                            Position posStar = new Position(x, y);
-                            staticObj.add(new Target(posStar));
-                            dynamicObj.add(new Box(posStar));
+                            // creating 2 different positions with the same coordinates so box and target are not indicating int the same place in memory and becoming just a star symbol
+                            Position posTar = new Position(x, y);
+                            Position posBox = new Position(x , y);
+                            staticObj.add(new Target(posTar));
+                            dynamicObj.add(new Box(posBox));
                             break;
                         case "+": 
-                            Position posPlus = new Position(x, y);
-                            staticObj.add(new Target(posPlus));
+                            // creating two variables with the same logic as in case : *
+                            Position posPlay = new Position(x, y);
+                            Position posTarg = new Position(x, y);
+                            staticObj.add(new Target(posTarg));
                             playercount++;
-                            dynamicObj.add(new Player(posPlus, this.height, this.width));
+                            dynamicObj.add(new Player(posPlay, this.height, this.width));
                             break;
                         case " ":
                             break;
@@ -269,7 +273,7 @@ public class GameMap {
         }
 
         // we then place in our array the dynamic objects with cheking if P , B are on the same 
-        // position as a Target 
+        // position as a Target and using the right symbol + or *
         for (GameObject dynObj : dynamicObj) {
             int x = dynObj.getPosition().getX();
             int y = dynObj.getPosition().getY();
